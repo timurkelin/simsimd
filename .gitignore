@@ -1,0 +1,26 @@
+# internal and intermediate data
+/int/
+/morgue/
+
+# Eclipse directories and files
+/.settings/
+/.cproject
+/.project
+/*.mat
+
+# Build directories
+/build/
+
+# Office lock files
+/doc/~*
+/doc/.~*
+
+# Generated files
+*.log
+*.out
+*.vcd
+*.m~
+
+
+
+
