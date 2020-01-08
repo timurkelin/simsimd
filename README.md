@@ -54,7 +54,7 @@ Vector Processor Architecture, SIMD, Single Instruction Multiple Data, ASIP, App
 * Scalar Infrastructure components
 
 ### Major development steps
-* Decompose the processing algorithm down to the level of the vector transactions between functional blocks and storage elements
+* Decompose processing algorithm down to the level of vector transactions between functional blocks and storage elements
 * Develop functional blocks which have specified interface with XBAR and Scalar Infrastructure
 * Assemble the functional blocks and storage elements with the Core framework
 * Develop control Scalar CPU SW and/or Control FSM

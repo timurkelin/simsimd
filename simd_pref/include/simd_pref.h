@@ -5,7 +5,6 @@
  *    Simulation preferences builder, reader and parser
  */
 
-
 #ifndef SIMD_PREF_INCLUDE_SIMD_PREF_H_
 #define SIMD_PREF_INCLUDE_SIMD_PREF_H_
 
@@ -29,6 +28,10 @@ namespace simd {
 
       void parse(
             void );
+
+      boost::optional<const boost_pt::ptree&> get_pref(
+            const std::string& field_name,
+            bool               check_error = true );
 
       boost::optional<const boost_pt::ptree&> core_p;
       boost::optional<const boost_pt::ptree&> pool_p;

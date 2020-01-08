@@ -28,7 +28,7 @@ void simd_pref_c::load(
    catch( ... ) {
       SIMD_REPORT_ERROR( "simd::pref" ) << "Unexpected";
    }
-}
+} // simd_pref_c::load(
 
 void simd_pref_c::save(
       const std::string& fname  ) {
@@ -44,50 +44,36 @@ void simd_pref_c::save(
    catch( ... ) {
       SIMD_REPORT_ERROR( "simd::pref" ) << "Unexpected";
    }
-}
+} // simd_pref_c::save(
+
+boost::optional<const boost_pt::ptree&> simd_pref_c::get_pref(
+      const std::string& field_name,
+      bool               check_error ) {
+
+   const boost_pt::ptree& root_r = root;
+   boost::optional<const boost_pt::ptree&> field_p = root_r.get_child_optional( field_name );
+
+   if( check_error && !field_p.is_initialized()) {
+      SIMD_REPORT_ERROR( "schd::pref" ) << "Missing <"
+                                        << field_name
+                                        << "> specification.";
+   }
+
+   return field_p;
+} // schd_pref_c::get_pref(
 
 void simd_pref_c::parse(
       void ) {
+   bool check_error = true;
 
-   core_p   = root.get_child_optional( "core" );
-   if( !core_p ) {
-      SIMD_REPORT_ERROR( "simd::pref" ) << "Missing <core> specification.";
-   }
-
-   pool_p   = root.get_child_optional( "pool" );
-   if( !pool_p ) {
-      SIMD_REPORT_ERROR( "simd::pref" ) << "Missing <pool> specification.";
-   }
-
-   clock_p   = root.get_child_optional( "clock" );
-   if( !clock_p ) {
-      SIMD_REPORT_ERROR( "simd::pref" ) << "Missing <clock> specification.";
-   }
-
-   scalar_p = root.get_child_optional( "scalar" );
-   if( !scalar_p ) {
-      SIMD_REPORT_ERROR( "simd::pref" ) << "Missing <scalar> specification.";
-   }
-
-   time_p   = root.get_child_optional( "time" );
-   if( !time_p ) {
-      SIMD_REPORT_ERROR( "simd::pref" ) << "Missing <time> specification.";
-   }
-
-   report_p = root.get_child_optional( "report" );
-   if( !report_p ) {
-      SIMD_REPORT_INFO( "simd::pref" ) << "Missing <report> specification.";
-   }
-
-   dump_p   = root.get_child_optional( "dump" );
-   if( !dump_p ) {
-      SIMD_REPORT_INFO( "simd::pref" ) << "Missing <dump> specification.";
-   }
-
-   trace_p  = root.get_child_optional( "trace" );
-   if( !trace_p ) {
-      SIMD_REPORT_INFO( "simd::pref" ) << "Missing <trace> specification.";
-   }
-} // void simd_pref_c::parse(
+   core_p   = get_pref( "core",   check_error );
+   pool_p   = get_pref( "pool",   check_error );
+   clock_p  = get_pref( "clock",  check_error );
+   scalar_p = get_pref( "scalar", check_error );
+   time_p   = get_pref( "time",   check_error );
+   report_p = get_pref( "report", check_error );
+   trace_p  = get_pref( "trace",  check_error );
+   dump_p   = get_pref( "dump",   check_error );
+} // simd_pref_c::parse(
 
 } // namespace simd

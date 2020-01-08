@@ -141,12 +141,15 @@ void simd_sys_core_c::init(
    proc_v.init( dmeu_info.size());
 
    // Create and initialise XBAR
+   std::string mod_name;
+
    if( !xbar_pref_p ) {
       SIMD_REPORT_ERROR( "simd::sys_core" ) << "Unable to find XBAR preferences";
    }
 
+   mod_name = xbar_pref_p.get().second.get<std::string>("name");
    xbar_p = boost::optional<simd::simd_sys_xbar_c &>(
-         *( new simd_sys_xbar_c( xbar_pref_p.get().second.get<std::string>("name").c_str())));
+         *( new simd_sys_xbar_c( mod_name.c_str())));
 
    xbar_p.get().init(
          xbar_pref_p.get().second.get_child_optional( "param" ),
@@ -157,8 +160,9 @@ void simd_sys_core_c::init(
                                         << " Nxo: " << xbar_p.get().data_xvo.size();
 
    // Create and initialise Event router
+   mod_name = std::string( name()) + "_event";
    event_p = boost::optional<simd::simd_sys_event_c &>(
-         *( new simd_sys_event_c( "event" )));
+         *( new simd_sys_event_c( mod_name.c_str())));
 
    event_p.get().init(
          dmeu_info );
@@ -167,8 +171,9 @@ void simd_sys_core_c::init(
                                         << " Nxi: " << event_p.get().event_vi.size();
 
    // Create and initialise BMUXW
+   mod_name = std::string( name()) + "_bmuxw";
    bmuxw_p = boost::optional<simd::simd_sys_bmuxw_c &>(
-         *( new simd_sys_bmuxw_c( "bmuxw" )));
+         *( new simd_sys_bmuxw_c( mod_name.c_str())));
 
    bmuxw_p.get().init(
          dmeu_info );
@@ -177,8 +182,9 @@ void simd_sys_core_c::init(
                                         << " Nxi: " << bmuxw_p.get().busw_vo.size();
 
    // Create and initialise BMUXR
+   mod_name = std::string( name()) + "_bmuxr";
    bmuxr_p = boost::optional<simd::simd_sys_bmuxr_c &>(
-         *( new simd_sys_bmuxr_c( "bmuxr" )));
+         *( new simd_sys_bmuxr_c( mod_name.c_str())));
 
    bmuxr_p.get().init(
          dmeu_info );
