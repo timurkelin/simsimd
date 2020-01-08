@@ -40,8 +40,24 @@ Vector Processor Architecture, SIMD, Single Instruction Multiple Data, ASIP, App
 ![alt text](https://github.com/timurkelin/simsimd/blob/master/doc/block_diagram.PNG)  
 
 ### Components in Brief
+* 2 major parts: Vector Core and Scalar or Control Core
+* Vector Core functions
+  * Perform vector computations in accordance to the configuration supplied from the Scalar Core
+  * Generate events at the different stages of the execution of the vector operations
+    * Events are delivered to the Scalar Core 
+    * Allow for synchronization of the control threads inside Scalar Core with the Vector Core 
+    * Update of the statuses of the vector operations
+    * Allow for data dependent processing
+  * Sequencing of the vector operations
+* Vector Core components 
+* Functions of the Scalar Infrastructure
+* Scalar Infrastructure components
 
-### Outline of the development strategy
+### Major development steps
+* Decompose the processing algorithm down to the level of the vector transactions between functional blocks and storage elements
+* Develop functional blocks which have specified interface with XBAR and Scalar Infrastructure
+* Assemble the functional blocks and storage elements with the Core framework
+* Develop control Scalar CPU SW and/or Control FSM
 
 For more details please refer to [doc/simsimd.pptx](https://github.com/timurkelin/simsimd/tree/master/doc)
 
