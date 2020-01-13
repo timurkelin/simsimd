@@ -337,8 +337,8 @@ void simd_sys_scalar_c::exec_thrd(
          + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
          + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_tail\"},"
          + "   {\"mod\":\"dm_2\",   \"evt\":\"rd_vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1\"       },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_2\"       }"
+         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1.complete\" },"
+         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_2.complete\" }"
          + "  ]"
          + "}" );
 
@@ -369,8 +369,8 @@ void simd_sys_scalar_c::exec_thrd(
          + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
          + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_tail\"},"
          + "   {\"mod\":\"dm_2\",   \"evt\":\"rd_vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1\"       },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_2\"       }"
+         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1.complete\" },"
+         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_2.complete\" }"
          + "  ],"
          + " \"error_any\":"
          + "  [{\"mod\":\"st_gen1\",\"evt\":\"vec_head\"   },"

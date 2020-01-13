@@ -257,7 +257,7 @@ void simd_sys_scalar_c::exec_thrd(
          + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
          + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_head\"},"
          + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1\"       }"
+         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1.complete\" }"
          + "  ]"
          + "}" );
 
@@ -284,7 +284,7 @@ void simd_sys_scalar_c::exec_thrd(
          + "{\"valid_all\":"
          + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_tail\"   },"
          + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1\"       }"
+         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1.complete\" }"
          + "  ],"
          + " \"error_any\":"
          + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_head\"   },"

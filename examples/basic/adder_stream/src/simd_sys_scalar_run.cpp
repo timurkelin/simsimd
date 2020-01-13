@@ -384,11 +384,11 @@ void simd_sys_scalar_c::exec_thrd(
          + "   {\"mod\":\"st_ana2\", \"evt\":\"vec_tail\"},"
          + "   {\"mod\":\"arith1\",  \"evt\":\"vec_tail\"},"
          + "   {\"mod\":\"arith2\",  \"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp1\" },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp2\" },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"st_gen3\" },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"arith1\"  },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"arith2\"  }"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp1.complete\" },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp2.complete\" },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"st_gen3.complete\" },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"arith1.complete\"  },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"arith2.complete\"  }"
          + "  ]"
          + "}" );
 
@@ -429,11 +429,11 @@ void simd_sys_scalar_c::exec_thrd(
          + "   {\"mod\":\"st_ana2\", \"evt\":\"vec_tail\"},"
          + "   {\"mod\":\"arith1\",  \"evt\":\"vec_tail\"},"
          + "   {\"mod\":\"arith2\",  \"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp1\" },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp2\" },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"st_gen3\" },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"arith1\"  },"
-         + "   {\"mod\":\"xbar\",    \"evt\":\"arith2\"  }"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp1.complete\" },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"st_inp2.complete\" },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"st_gen3.complete\" },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"arith1.complete\"  },"
+         + "   {\"mod\":\"xbar\",    \"evt\":\"arith2.complete\"  }"
          + "  ]"
          + "}" );
 

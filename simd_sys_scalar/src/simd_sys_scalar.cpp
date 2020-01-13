@@ -53,17 +53,7 @@ simd_sys_scalar_c::evt_proc_t simd_sys_scalar_c::evt_proc_check(
 
    try {
       mod_name = event_pt.get<std::string>( "source" );
-
-      if( mod_name == "xbar" ) {
-         evt_name = event_pt.get<std::string>( "mod_name" );
-
-         if( event_pt.get<std::string>( "event_id" ) != "mod_done" ) {
-            SIMD_REPORT_ERROR( "simd::sys_scalar" ) << " Incorrect structure of the xbar event";
-         }
-      }
-      else {
-         evt_name = event_pt.get<std::string>( "event_id" );
-      }
+      evt_name = event_pt.get<std::string>( "event_id" );
    }
    catch( const boost_pt::ptree_error& err ) {
       SIMD_REPORT_ERROR( "simd::sys_scalar" ) << err.what();

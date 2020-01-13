@@ -331,9 +331,7 @@ void simd_sys_xbar_c::event(
       boost_pt::ptree  event_pt;
       simd_sig_ptree_c event_out;
 
-      event_pt.put( "event_id", event_id );
-      event_pt.put( "mod_name", mod_name );
-
+      event_pt.put( "event_id", mod_name + "." + event_id );
       event_o->nb_write( event_out.set( event_pt ));
    }
    else {
@@ -894,7 +892,7 @@ void simd_sys_xbar_c::conf_thrd(
 
             // Generate done event
             if( done_event ) {
-               event( mod.name, "mod_done" );
+               event( mod.name, "complete" );
             }
 
             // Disconnect destination ports of the DM/EU module
