@@ -37,7 +37,7 @@ Vector Processor Architecture, SIMD, Single Instruction Multiple Data, ASIP, App
   * Open source
   
 ### Block Diagram of the Simulation Platform
-![alt text](https://github.com/timurkelin/simsimd/blob/master/doc/block_diagram.PNG)  
+![block_diagram][block_dia]  
 
 ### Components in Brief
 * 2 major parts: Vector Core and Scalar or Control Core
@@ -83,7 +83,7 @@ Vector Processor Architecture, SIMD, Single Instruction Multiple Data, ASIP, App
 * Assemble the functional blocks and storage elements with the Core framework
 * Develop Scalar CPU SW and/or Control FSM
 
-For more details please refer to [doc/simsimd.pptx](https://github.com/timurkelin/simsimd/tree/master/doc)
+For more details and application examples please refer to [doc/simsimd.pptx][full_doc]
 
 Directories:
 ```
@@ -125,10 +125,10 @@ makefile     	- top-level makefile
 Prerequisites:   
    GCC      (4.8.5)  
    make     (3.82)  
-   [SystemC  (2.3.3)](https://www.accellera.org/downloads/standards/systemc)  
-   [Boost    (1.68.0)](https://www.boost.org/)  
-   [matIO    (1.5.16)](https://sourceforge.net/projects/matio/)   
-   [gtkwave  (3.3.95)](http://gtkwave.sourceforge.net/) or other VCD viewer 
+   [SystemC  (2.3.3)][systemc]   
+   [Boost    (1.68.0)][boost]   
+   [matIO    (1.5.16)][matio]   
+   [gtkwave  (3.3.95)][gtkwave] or other VCD viewer   
 
 Environment:
 ```
@@ -156,3 +156,12 @@ Run:
 Inspect the result:
 In gtkwave File->Open New Window->trace.vcd 
 ```
+
+[block_dia]: https://github.com/timurkelin/simsimd/blob/master/doc/block_diagram.PNG
+[full_doc]: https://github.com/timurkelin/simsimd/tree/master/doc
+[screenshot]: https://github.com/timurkelin/simsimd/blob/master/doc/test_short_waves.PNG
+
+[systemc]: https://www.accellera.org/downloads/standards/systemc
+[boost]: https://www.boost.org/
+[matio]: https://sourceforge.net/projects/matio/
+[gtkwave]: http://gtkwave.sourceforge.net/
