@@ -12,7 +12,6 @@ CMP_DIRS = simd_common  \
            simd_sys_crm     \
            simd_sys_core    \
            simd_sys_scalar  \
-           simd_sys_bmux    \
            simd_sys_xbar    \
            simd_sys_eu      \
            simd_sys_dm      \

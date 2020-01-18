@@ -15,6 +15,7 @@
 #include <boost/regex.hpp>
 #include <systemc>
 #include "simd_sig_ptree.h"
+#include "simd_dump.h"
 
 // Short alias for the namespace
 namespace boost_pt = boost::property_tree;
@@ -31,7 +32,7 @@ namespace simd {
       // Constructor declaration
       SC_CTOR( simd_ptree_xbar_c );
 
-      // Init declaration (to be called after the instantiation and before the port binding)
+      // Init declaration (to be used after the instantiation and before the port binding)
       void init(
             boost::optional<const boost_pt::ptree&> _pref_p );
 
@@ -45,6 +46,9 @@ namespace simd {
          bool         regex = false;
          std::string  name;
          boost::regex mask;
+
+         std::string                                         dump_name;
+         boost::optional<simd_dump_buf_c<boost_pt::ptree> &> dump_p = boost::none;
       };
 
       std::vector<port_map_t> vi_map;

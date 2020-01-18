@@ -46,7 +46,7 @@ void simd_ptree_xbar_c::init(
    vi.init(       src_list_size );
    vi_map.resize( src_list_size );
 
-   std::size_t src_list_cnt = 0;
+   std::vector<port_map_t>::iterator src_map_it = vi_map.begin();
 
    BOOST_FOREACH( const boost_pt::ptree::value_type& src_el, src_list_p.get()) {
       if( !src_el.first.empty()) {
@@ -55,11 +55,13 @@ void simd_ptree_xbar_c::init(
 
       boost::optional<std::string> src_name_p = src_el.second.get_optional<std::string>("name");
       boost::optional<std::string> src_mask_p = src_el.second.get_optional<std::string>("mask");
+      boost::optional<std::string> src_dump_p = src_el.second.get_optional<std::string>("dump");
 
       if(( !src_name_p.is_initialized() &&
            !src_mask_p.is_initialized()) ||
          (  src_name_p.is_initialized() &&
-            src_mask_p.is_initialized())) {
+            src_mask_p.is_initialized()) ||
+           !src_dump_p.is_initialized() ) {
          std::string _str;
 
          SIMD_REPORT_ERROR( "simd::xbar" ) << name()
@@ -68,11 +70,11 @@ void simd_ptree_xbar_c::init(
       }
 
       if( src_name_p.is_initialized() ) {
-         vi_map.at( src_list_cnt ).name = src_name_p.get();
+         src_map_it->name = src_name_p.get();
       }
       else if( src_mask_p.is_initialized() ) {
          try {
-            vi_map.at( src_list_cnt ).mask = src_mask_p.get();
+            src_map_it->mask = src_mask_p.get();
          }
          catch( const boost::regex_error& err ) {
             SIMD_REPORT_ERROR( "simd::xbar" ) << err.what();
@@ -82,7 +84,17 @@ void simd_ptree_xbar_c::init(
          }
       }
 
-      src_list_cnt ++;
+      src_map_it->dump_name = src_dump_p.get();
+
+      if( src_map_it->dump_name.size()) {
+         simd_dump_buf_c<boost_pt::ptree> *dump_raw_ptr =
+               new simd_dump_buf_c<boost_pt::ptree>( src_map_it->dump_name );
+
+         src_map_it->dump_p =
+               boost::optional<simd_dump_buf_c<boost_pt::ptree> &>( *dump_raw_ptr );
+      }
+
+      src_map_it = std::next( src_map_it );
    } // BOOST_FOREACH( const boost_pt::ptree::value_type& src_el, src_list_p.get())
 
    if( !dst_list_p.is_initialized()) {
@@ -99,7 +111,7 @@ void simd_ptree_xbar_c::init(
    vo.init(       dst_list_size );
    vo_map.resize( dst_list_size );
 
-   std::size_t dst_list_cnt = 0;
+   std::vector<port_map_t>::iterator dst_map_it = vo_map.begin();
 
    BOOST_FOREACH( const boost_pt::ptree::value_type& dst_el, dst_list_p.get()) {
       if( !dst_el.first.empty()) {
@@ -108,11 +120,13 @@ void simd_ptree_xbar_c::init(
 
       boost::optional<std::string> dst_name_p = dst_el.second.get_optional<std::string>("name");
       boost::optional<std::string> dst_mask_p = dst_el.second.get_optional<std::string>("mask");
+      boost::optional<std::string> dst_dump_p = dst_el.second.get_optional<std::string>("dump");
 
       if(( !dst_name_p.is_initialized() &&
            !dst_mask_p.is_initialized()) ||
          (  dst_name_p.is_initialized() &&
-            dst_mask_p.is_initialized())) {
+            dst_mask_p.is_initialized()) ||
+           !dst_dump_p.is_initialized() ) {
          std::string _str;
 
          SIMD_REPORT_ERROR( "simd::xbar" ) << name()
@@ -121,12 +135,12 @@ void simd_ptree_xbar_c::init(
       }
 
       if( dst_name_p.is_initialized() ) {
-         vo_map.at( dst_list_cnt ).name  = dst_name_p.get();
-         vo_map.at( dst_list_cnt ).regex = false;
+         dst_map_it->name  = dst_name_p.get();
+         dst_map_it->regex = false;
       }
       else if( dst_mask_p.is_initialized() ) {
          try {
-            vo_map.at( dst_list_cnt ).mask = dst_mask_p.get();
+            dst_map_it->mask = dst_mask_p.get();
          }
          catch( const boost::regex_error& err ) {
             SIMD_REPORT_ERROR( "simd::xbar" ) << err.what();
@@ -135,10 +149,20 @@ void simd_ptree_xbar_c::init(
             SIMD_REPORT_ERROR( "simd::xbar" ) << "Unexpected";
          }
 
-         vo_map.at( dst_list_cnt ).regex = true;
+         dst_map_it->regex = true;
       }
 
-      dst_list_cnt ++;
+      dst_map_it->dump_name = dst_dump_p.get();
+
+      if( dst_map_it->dump_name.size()) {
+         simd_dump_buf_c<boost_pt::ptree> *dump_raw_ptr =
+               new simd_dump_buf_c<boost_pt::ptree>( dst_map_it->dump_name );
+
+         dst_map_it->dump_p =
+               boost::optional<simd_dump_buf_c<boost_pt::ptree> &>( *dump_raw_ptr );
+      }
+
+      dst_map_it = std::next( dst_map_it );
    } // BOOST_FOREACH( const boost_pt::ptree::value_type& dst_el, dst_list_p.get())
 } // void simd_ptree_xbar_c::init(
 
@@ -162,15 +186,33 @@ void simd_ptree_xbar_c::exec_thrd( void ) {
             const boost_pt::ptree& pt_inp = pt_raw;
             simd_sig_ptree_c       pt_out;
 
+            if( vi_map.at( n_stat ).dump_p.is_initialized()) {
+               vi_map.at( n_stat ).dump_p.get().write( pt_inp, BUF_WRITE_LAST );
+            }
+
             if( vo.size() == 1 ) { // Single output. Don't check dst
                pt_out.set( pt_inp );
                vo.at( 0 )->write( pt_out );
+
+               if( vo_map.at( 0 ).dump_p.is_initialized()) {
+                  vo_map.at( 0 ).dump_p.get().write( pt_inp, BUF_WRITE_LAST );
+               }
             } // if( vo.size() == 1 )
             else {
                boost::optional<const boost_pt::ptree&> dst_list_p = pt_inp.get_child_optional("dst");
                boost::optional<std::string>            dst_str_p  = pt_inp.get_optional<std::string>("dst");
 
-               if( dst_list_p.is_initialized()) {
+               if( dst_str_p.is_initialized() && dst_str_p.get() == "broadcast" ) { // Broadcast to all outputs
+                  pt_out.set( pt_inp );
+
+                  for( std::size_t dst_idx = 0; dst_idx < vo.size(); dst_idx ++ ) {
+                     vo.at( dst_idx )->write( pt_out );
+
+                     if( vo_map.at( dst_idx ).dump_p.is_initialized()) {
+                        vo_map.at( dst_idx ).dump_p.get().write( pt_inp, BUF_WRITE_LAST );
+                     }
+                  }
+               } else if( dst_list_p.is_initialized()) { // Sent to the outputs specified in the list
                   std::vector<bool> dst_wr( vo.size(), false );
 
                   BOOST_FOREACH( const boost_pt::ptree::value_type& dst_el, dst_list_p.get()) {
@@ -204,16 +246,13 @@ void simd_ptree_xbar_c::exec_thrd( void ) {
                      else {
                         vo.at( dst_idx )->write( pt_out.set( pt_inp )); // Write data to the output
                         dst_wr.at( dst_idx ) = true;
+
+                        if( vo_map.at( dst_idx ).dump_p.is_initialized()) {
+                           vo_map.at( dst_idx ).dump_p.get().write( pt_inp, BUF_WRITE_LAST );
+                        }
                      }
                   } // BOOST_FOREACH( const boost_pt::ptree::value_type& dst_el, dst_list_p.get())
                } // if( dst_list_p.is_initialized())
-               else if( dst_str_p.is_initialized() && dst_str_p.get() == "broadcast") { // Broadcast to all outputs
-                  pt_out.set( pt_inp );
-
-                  for( std::size_t dst_idx = 0; dst_idx < vo.size(); dst_idx ++ ) {
-                     vo.at( dst_idx )->write( pt_out );
-                  }
-               }
                else {
                   SIMD_REPORT_ERROR( "simd::xbar" ) << name() << " Destination not found";
                }

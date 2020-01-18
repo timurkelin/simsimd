@@ -13,21 +13,6 @@
 
 namespace simd {
 
-bool check_event(
-      const boost_pt::ptree& event_pt,
-      const std::string& source,
-      const std::string& event_id ) {
-   if( source == "xbar" ) {
-      return ( event_pt.get<std::string>( "source"   ) == source    &&
-               event_pt.get<std::string>( "mod_name" ) == event_id  &&
-               event_pt.get<std::string>( "event_id" ) == "mod_done" );
-   }
-   else {
-      return ( event_pt.get<std::string>( "source"   ) == source    &&
-               event_pt.get<std::string>( "event_id" ) == event_id );
-   }
-}
-
 namespace boost_rn = boost::random;
 
 unsigned int n_test;
@@ -69,7 +54,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for step1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"conf_next\":8,\"routing\":"
          + "       [{\"mod\":\"st_gen1\",\"port\":0,\"event\":1,\"dst\":"
          + "           [{\"mod\":\"transp1\",   \"port\":0,\"master\":1"
@@ -99,7 +84,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Source 1 for step 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_gen1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_gen1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ],"
@@ -111,7 +96,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Source 2 for step 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_gen2\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_gen2\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ],"
@@ -123,7 +108,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Destination 1 for step 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_ana1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_ana1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ],"
@@ -135,7 +120,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Destination 2 for step 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_ana2\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_ana2\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ],"
@@ -147,7 +132,7 @@ void simd_sys_scalar_c::exec_thrd(
       // transp 1 (synchronous) for step1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"transp1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"transp1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ]"
@@ -158,7 +143,7 @@ void simd_sys_scalar_c::exec_thrd(
       // transp 2 (asynchronous) for step1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"transp2\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"transp2\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ]"
@@ -169,31 +154,31 @@ void simd_sys_scalar_c::exec_thrd(
       // Run
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"broadcast\",\"idx\":100,\"cmd\":\"run\""
+         + "{ \"dst\":\"broadcast\",\"idx\":100,\"cmd\":\"run\""
          + "}" );
       SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Start  01.08";
 
       // Wait for the completion events from the modules and xbar
       evt_proc_init( std::string("")
          + "{\"valid_all\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"st_gen1\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"transp1\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"st_ana2\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"st_gen2\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"transp2\",\"evt\":\"vec_head\"}"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"st_gen1\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"transp1\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"st_ana2\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"st_gen2\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"transp2\",\"evt\":\"vec_head\"}"
          + "  ],"
          + " \"error_any\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"st_gen1\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"transp1\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"st_ana2\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"st_gen2\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"transp2\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"st_gen1.complete\" },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"transp1.complete\" },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"st_gen2.complete\" },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"transp2.complete\" }"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"st_gen1\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"transp1\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"st_ana2\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"st_gen2\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"transp2\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"xbar\",   \"evt\":\"st_gen1.complete\" },"
+         + "   {\"src\":\"xbar\",   \"evt\":\"transp1.complete\" },"
+         + "   {\"src\":\"xbar\",   \"evt\":\"st_gen2.complete\" },"
+         + "   {\"src\":\"xbar\",   \"evt\":\"transp2.complete\" }"
          + "  ]"
          + "}" );
 
@@ -218,24 +203,24 @@ void simd_sys_scalar_c::exec_thrd(
       // Wait for the completion events from the modules and xbar
       evt_proc_init( std::string("")
          + "{\"valid_all\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"st_gen1\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"transp1\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"st_ana2\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"st_gen2\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"transp2\",\"evt\":\"vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"st_gen1.complete\" },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"transp1.complete\" },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"st_gen2.complete\" },"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"transp2.complete\" }"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"st_gen1\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"transp1\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"st_ana2\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"st_gen2\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"transp2\",\"evt\":\"vec_tail\"},"
+         + "   {\"src\":\"xbar\",   \"evt\":\"st_gen1.complete\" },"
+         + "   {\"src\":\"xbar\",   \"evt\":\"transp1.complete\" },"
+         + "   {\"src\":\"xbar\",   \"evt\":\"st_gen2.complete\" },"
+         + "   {\"src\":\"xbar\",   \"evt\":\"transp2.complete\" }"
          + "  ],"
          + " \"error_any\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"st_gen1\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"transp1\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"st_ana2\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"st_gen2\",\"evt\":\"vec_head\"},"
-         + "   {\"mod\":\"transp2\",\"evt\":\"vec_head\"}"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"st_gen1\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"transp1\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"st_ana2\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"st_gen2\",\"evt\":\"vec_head\"},"
+         + "   {\"src\":\"transp2\",\"evt\":\"vec_head\"}"
          + "  ]"
          + "}" );
 

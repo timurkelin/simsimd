@@ -13,21 +13,6 @@
 
 namespace simd {
 
-bool check_event(
-      const boost_pt::ptree& event_pt,
-      const std::string& source,
-      const std::string& event_id ) {
-   if( source == "xbar" ) {
-      return ( event_pt.get<std::string>( "source"   ) == source    &&
-               event_pt.get<std::string>( "mod_name" ) == event_id  &&
-               event_pt.get<std::string>( "event_id" ) == "mod_done" );
-   }
-   else {
-      return ( event_pt.get<std::string>( "source"   ) == source    &&
-               event_pt.get<std::string>( "event_id" ) == event_id );
-   }
-}
-
 namespace boost_rn = boost::random;
 
 unsigned int n_test;
@@ -65,7 +50,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for initial transaction
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":101,\"conf_next\":8,\"routing\":"
          + "       [{\"mod\":\"sti_1\",\"port\":0,\"event\":1,\"dst\":"
          + "           [{\"mod\":\"dm_1\",\"port\":0,\"master\":1"
@@ -89,7 +74,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure Input Stream 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"sti_1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"sti_1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":101,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"pool_seg\":\"seg_rd0\",\"blk_start\":0,\"blk_size\":\"800\","
          + "     \"ws_min\":" + std::to_string( rng_ws_min ) + ","
@@ -101,7 +86,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":101,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"write\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -118,7 +103,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":101,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"],"
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -128,7 +113,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure Input Stream 2
       sc_core::wait();
       wr_conf( std::string("")
-      + "{ \"dest\":\"sti_2\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+      + "{ \"dst\":[\"sti_2\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
       + "    {\"exec_idx\":101,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"],"
       + "     \"pool_seg\":\"seg_rdwr1\",\"blk_start\":512,\"blk_size\":\"800\","
       + "     \"ws_min\":" + std::to_string( rng_ws_min ) + ","
@@ -140,7 +125,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_2\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_2\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":101,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"write\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -157,7 +142,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_2\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_2\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":101,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"],"
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -167,7 +152,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for computation
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"conf_next\":8,\"routing\":"
          + "       [{\"mod\":\"dm_1\",\"port\":0,\"event\":1,\"dst\":"
          + "           [{\"mod\":\"arith_1\",\"port\":0,\"master\":1"
@@ -208,7 +193,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"read\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -225,7 +210,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_1\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_1\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -235,7 +220,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_2\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_2\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"read\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -252,7 +237,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_2\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_2\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -262,7 +247,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure ADD/SUB EU 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"arith_1\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"arith_1\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"neg_re0\":\"0\",\"neg_im0\":\"0\",\"neg_re1\":\"0\",\"neg_im1\":\"0\",\"smp_nena_op\":\"error\""
          + "    }"
@@ -272,7 +257,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Source 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"gen_1\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"gen_1\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"vec_size\":\"200\",\"slot_ena_ovr\":1,\"valid_ovr\":1"
          + "    }"
@@ -282,7 +267,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure ADD/SUB EU 2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"arith_2\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"arith_2\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"neg_re0\":\"0\",\"neg_im0\":\"0\",\"neg_re1\":\"1\",\"neg_im1\":\"1\",\"smp_nena_op\":\"error\"" // Subtract on port1
          + "    }"
@@ -292,7 +277,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_3\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_3\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"write\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -309,7 +294,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_3\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_3\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":102,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -319,7 +304,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for the subsequent transactions
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"conf_next\":8,\"routing\":"
          + "       [{\"mod\":\"sti_1\",\"port\":0,\"event\":1,\"dst\":"
          + "           [{\"mod\":\"dm_1\",\"port\":0,\"master\":1"
@@ -350,7 +335,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure Input Stream 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"sti_1\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"sti_1\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"pool_seg\":\"seg_rd0\",\"blk_start\":0,\"blk_size\":\"800\","
          + "     \"ws_min\":" + std::to_string( rng_ws_min ) + ","
@@ -362,7 +347,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"write\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -379,7 +364,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_1\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_1\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -389,7 +374,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure Input Stream 2
       sc_core::wait();
       wr_conf( std::string("")
-      + "{ \"dest\":\"sti_2\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+      + "{ \"dst\":[\"sti_2\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
       + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
       + "     \"pool_seg\":\"seg_rdwr1\",\"blk_start\":512,\"blk_size\":\"800\","
       + "     \"ws_min\":" + std::to_string( rng_ws_min ) + ","
@@ -401,7 +386,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_2\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_2\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"write\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -418,7 +403,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_2\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_2\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -428,7 +413,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_3\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_3\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"read\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -445,7 +430,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_3\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_3\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -455,7 +440,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure Output Stream 1
       sc_core::wait();
       wr_conf( std::string("")
-      + "{ \"dest\":\"sto_1\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+      + "{ \"dst\":[\"sto_1\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
       + "    {\"exec_idx\":103,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
       + "     \"pool_seg\":\"seg_wr0\",\"blk_start\":512,"
       + "     \"ws_min\":" + std::to_string( rng_ws_min ) + ","
@@ -467,7 +452,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for last transaction
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":104,\"conf_next\":8,\"routing\":"
          + "       [{\"mod\":\"dm_3\",\"port\":0,\"event\":1,\"dst\":"
          + "           [{\"mod\":\"sto_1\",\"port\":0,\"master\":1"
@@ -484,7 +469,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_3\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_3\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":104,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"wr_vec_head\",\"wr_vec_tail\",\"rd_vec_head\",\"rd_vec_tail\"],"
          + "     \"op_mode\":\"read\",\"smp_num\":200,\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -501,7 +486,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure analyzer 3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"ana_3\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"ana_3\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":104,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
          + "     \"ready_ovr\":1" // To operate as Slave
          + "    }"
@@ -511,7 +496,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure Output Stream 1
       sc_core::wait();
       wr_conf( std::string("")
-      + "{ \"dest\":\"sto_1\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+      + "{ \"dst\":[\"sto_1\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
       + "    {\"exec_idx\":104,\"stat_idx\":0,\"conf_next\":8,\"events\":[\"vec_head\",\"vec_tail\"]," // no events for this stage
       + "     \"pool_seg\":\"seg_rdwr1\",\"blk_start\":512,"
       + "     \"ws_min\":" + std::to_string( rng_ws_min ) + ","
@@ -529,56 +514,56 @@ void simd_sys_scalar_c::exec_thrd(
          if( n_cyc == 0 ) {
             // Run the very first transaction
             wr_conf( std::string("")
-               + "{ \"dest\":\"broadcast\",\"idx\":101,\"cmd\":\"run\""
+               + "{ \"dst\":\"broadcast\",\"idx\":101,\"cmd\":\"run\""
                + "}" );
             SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Start  01.00";
 
             // Wait for the thread to start
             evt_proc_init( std::string("")
                + "{\"valid_all\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   }"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   }"
                + "  ],"
                + " \"error_any\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
 
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
                + "  ]"
                + "}" );
 
@@ -603,50 +588,50 @@ void simd_sys_scalar_c::exec_thrd(
             // Wait for the completion
             evt_proc_init( std::string("")
             + "{\"error_any\":"
-            + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+            + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
 
-            + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
 
-            + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
 
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
             + "  ],"
             + " \"valid_all\":"
-            + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+            + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
 
-            + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\" },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\" }"
+            + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\" },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\" }"
             + "  ]"
             + "}" );
 
@@ -672,56 +657,56 @@ void simd_sys_scalar_c::exec_thrd(
          else if( n_cyc < n_cyc_end ) {
             // Run a number of subsequent transactions
             wr_conf( std::string("")
-               + "{ \"dest\":\"broadcast\",\"idx\":103,\"cmd\":\"run\""
+               + "{ \"dst\":\"broadcast\",\"idx\":103,\"cmd\":\"run\""
                + "}" );
             SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Start  03.00";
 
             // Wait for the thread to start
             evt_proc_init( std::string("")
                + "{\"valid_all\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   }"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   }"
                + "  ],"
                + " \"error_any\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
 
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
                + "  ]"
                + "}" );
 
@@ -746,50 +731,50 @@ void simd_sys_scalar_c::exec_thrd(
             // Wait for the completion
             evt_proc_init( std::string("")
             + "{\"error_any\":"
-            + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+            + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
 
-            + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
 
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
 
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
             + "  ],"
             + " \"valid_all\":"
-            + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+            + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
 
-            + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\" },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\" },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"  }"
+            + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\" },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\" },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"  }"
             + "  ]"
             + "}" );
 
@@ -815,56 +800,56 @@ void simd_sys_scalar_c::exec_thrd(
          else {
             // Run the last transaction
             wr_conf( std::string("")
-               + "{ \"dest\":\"broadcast\",\"idx\":104,\"cmd\":\"run\""
+               + "{ \"dst\":\"broadcast\",\"idx\":104,\"cmd\":\"run\""
                + "}" );
             SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Start  04.00";
 
             // Wait for the thread to start
             evt_proc_init( std::string("")
                + "{\"valid_all\":"
-               + "  [{\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   }"
+               + "  [{\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   }"
                + "  ],"
                + " \"error_any\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
 
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
                + "  ]"
                + "}" );
 
@@ -889,50 +874,50 @@ void simd_sys_scalar_c::exec_thrd(
             // Wait for the completion
             evt_proc_init( std::string("")
             + "{\"error_any\":"
-            + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+            + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
 
-            + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-            + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-            + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+            + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+            + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
 
-            + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-            + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+            + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
 
-            + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-            + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+            + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+            + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
             + "  ],"
             + " \"valid_all\":"
-            + "  [{\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-            + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-            + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+            + "  [{\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+            + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+            + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
 
-            + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"    }"
+            + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"    }"
             + "  ]"
             + "}" );
 
@@ -959,59 +944,59 @@ void simd_sys_scalar_c::exec_thrd(
          if( n_cyc < n_cyc_end ) {
             // Run the computation
             wr_conf( std::string("")
-               + "{ \"dest\":\"broadcast\",\"idx\":102,\"cmd\":\"run\""
+               + "{ \"dst\":\"broadcast\",\"idx\":102,\"cmd\":\"run\""
                + "}" );
             SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Start  02.00";
 
             // Wait for the thread to start
             evt_proc_init( std::string("")
                + "{\"valid_all\":"
-               + "  [{\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"}"
+               + "  [{\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"}"
                + "  ],"
                + " \"error_any\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
 
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
 
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
                + "  ]"
                + "}" );
 
@@ -1036,50 +1021,50 @@ void simd_sys_scalar_c::exec_thrd(
             // Wait for the completion
             evt_proc_init( std::string("")
                + "{\"valid_all\":"
-               + "  [{\"mod\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
+               + "  [{\"src\":\"dm_1\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_1.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_2.complete\"    },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"gen_1.complete\"   },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_1.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"arith_2.complete\" }"
                + "  ],"
                + " \"error_any\":"
-               + "  [{\"mod\":\"sti_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
+               + "  [{\"src\":\"sti_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sti_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sti_2\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"wr_vec_tail\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"wr_vec_tail\"},"
 
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"sto_1\",   \"evt\":\"vec_tail\"   },"
 
-               + "   {\"mod\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"ana_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_2\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"gen_1\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_1\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"arith_2\", \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"ana_3\",   \"evt\":\"vec_head\"   },"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
+               + "   {\"src\":\"dm_1\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_2\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"ana_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_2\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"gen_1\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_1\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"arith_2\", \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"ana_3\",   \"evt\":\"vec_head\"   },"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"wr_vec_head\"},"
 
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
-               + "   {\"mod\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_head\"},"
+               + "   {\"src\":\"dm_3\",    \"evt\":\"rd_vec_tail\"},"
 
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_1.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"sti_2.complete\" },"
-               + "   {\"mod\":\"xbar\",    \"evt\":\"dm_3.complete\"  }"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_1.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"sti_2.complete\" },"
+               + "   {\"src\":\"xbar\",    \"evt\":\"dm_3.complete\"  }"
                + "  ]"
                + "}" );
 

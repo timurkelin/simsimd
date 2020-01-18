@@ -63,7 +63,7 @@ namespace simd {
             const boost_pt::ptree& event_pt );
 
       typedef struct {
-         std::string mod_name;
+         std::string src_name;
          std::string evt_name;
          bool        valid_all;
          bool        valid_any;

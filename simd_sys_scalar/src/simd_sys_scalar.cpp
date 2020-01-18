@@ -48,11 +48,11 @@ void simd_sys_scalar_c::evt_proc_clear(
 simd_sys_scalar_c::evt_proc_t simd_sys_scalar_c::evt_proc_check(
       const boost_pt::ptree& event_pt ) {
 
-   std::string mod_name;
+   std::string src_name;
    std::string evt_name;
 
    try {
-      mod_name = event_pt.get<std::string>( "source" );
+      src_name = event_pt.get<std::string>( "src" );
       evt_name = event_pt.get<std::string>( "event_id" );
    }
    catch( const boost_pt::ptree_error& err ) {
@@ -68,7 +68,7 @@ simd_sys_scalar_c::evt_proc_t simd_sys_scalar_c::evt_proc_check(
    bool error_any = false;
 
    BOOST_FOREACH( evt_proc_data_t& evt_data, evt_proc ) {
-      evt_data.evt |= ( evt_data.mod_name == mod_name &&
+      evt_data.evt |= ( evt_data.src_name == src_name &&
                         evt_data.evt_name == evt_name );
 
       if( evt_data.valid_all ) {
@@ -144,7 +144,7 @@ void simd_sys_scalar_c::evt_proc_init(
          }
 
          try {
-            evt_proc_elem.mod_name = evt.second.get<std::string>( "mod" );
+            evt_proc_elem.src_name = evt.second.get<std::string>( "src" );
             evt_proc_elem.evt_name = evt.second.get<std::string>( "evt" );
          }
          catch( const boost_pt::ptree_error& err ) {
@@ -173,7 +173,7 @@ void simd_sys_scalar_c::evt_proc_init(
          }
 
          try {
-            evt_proc_elem.mod_name = evt.second.get<std::string>( "mod" );
+            evt_proc_elem.src_name = evt.second.get<std::string>( "src" );
             evt_proc_elem.evt_name = evt.second.get<std::string>( "evt" );
          }
          catch( const boost_pt::ptree_error& err ) {
@@ -202,7 +202,7 @@ void simd_sys_scalar_c::evt_proc_init(
          }
 
          try {
-            evt_proc_elem.mod_name = evt.second.get<std::string>( "mod" );
+            evt_proc_elem.src_name = evt.second.get<std::string>( "src" );
             evt_proc_elem.evt_name = evt.second.get<std::string>( "evt" );
          }
          catch( const boost_pt::ptree_error& err ) {
@@ -231,7 +231,7 @@ void simd_sys_scalar_c::evt_proc_init(
          }
 
          try {
-            evt_proc_elem.mod_name = evt.second.get<std::string>( "mod" );
+            evt_proc_elem.src_name = evt.second.get<std::string>( "src" );
             evt_proc_elem.evt_name = evt.second.get<std::string>( "evt" );
          }
          catch( const boost_pt::ptree_error& err ) {

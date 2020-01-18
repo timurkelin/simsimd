@@ -14,21 +14,6 @@
 
 namespace simd {
 
-bool check_event(
-      const boost_pt::ptree& event_pt,
-      const std::string& source,
-      const std::string& event_id ) {
-   if( source == "xbar" ) {
-      return ( event_pt.get<std::string>( "source"   ) == source    &&
-               event_pt.get<std::string>( "mod_name" ) == event_id  &&
-               event_pt.get<std::string>( "event_id" ) == "mod_done" );
-   }
-   else {
-      return ( event_pt.get<std::string>( "source"   ) == source    &&
-               event_pt.get<std::string>( "event_id" ) == event_id );
-   }
-}
-
 namespace boost_rn = boost::random;
 
 unsigned int n_test;
@@ -70,7 +55,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for step1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"conf_next\":1,\"routing\":"
          + "       [{\"mod\":\"dm_1\",\"port\":0,\"event\":0,\"dst\":"
          + "           [{\"mod\":\"st_ana1\",\"port\":0,\"master\":1"
@@ -85,7 +70,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1 for step1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":1,\"events\":[],"
          + "     \"op_mode\":\"read\",\"smp_num\":" + std::to_string( 100 / simd_dmeu_data_c::dim ) +",\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -102,7 +87,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Destination for step1
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_ana1\",\"idx\":0,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_ana1\"],\"idx\":0,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":100,\"stat_idx\":0,\"conf_next\":1,\"events\":[]," // no events for this stage
          + "     \"ready_ovr\":" + std::to_string( rng_val())
          + "    }"
@@ -112,7 +97,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for step2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"conf_next\":2,\"routing\":"
          + "       [{\"mod\":\"dm_1\",\"port\":0,\"event\":0,\"dst\":"
          + "           [{\"mod\":\"st_ana1\",\"port\":0,\"master\":1"
@@ -127,7 +112,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1 for step2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"stat_idx\":0,\"conf_next\":2,\"events\":[],"
          + "     \"op_mode\":\"read\",\"smp_num\":" + std::to_string( 200 / simd_dmeu_data_c::dim ) +",\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -144,7 +129,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Destination for step2
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_ana1\",\"idx\":1,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_ana1\"],\"idx\":1,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"stat_idx\":0,\"conf_next\":2,\"events\":[]," // no events for this stage
          + "     \"ready_ovr\":" + std::to_string( rng_val())
          + "    }"
@@ -154,7 +139,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for step3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"conf_next\":3,\"routing\":"
          + "       [{\"mod\":\"dm_1\",\"port\":0,\"event\":0,\"dst\":"
          + "           [{\"mod\":\"st_ana1\",\"port\":0,\"master\":1"
@@ -169,7 +154,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1 for step3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"stat_idx\":0,\"conf_next\":3,\"events\":[],"
          + "     \"op_mode\":\"read\",\"smp_num\":" + std::to_string( 300 / simd_dmeu_data_c::dim ) +",\"ag_conf\":"
          + "       {\"mode\":\"linear\", \"param\":"
@@ -186,7 +171,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Destination for step3
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_ana1\",\"idx\":2,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_ana1\"],\"idx\":2,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"stat_idx\":0,\"conf_next\":3,\"events\":[]," // no events for this stage
          + "     \"ready_ovr\":" + std::to_string( rng_val())
          + "    }"
@@ -196,7 +181,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure XBAR for step4
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"xbar\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"xbar\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"conf_next\":8,\"routing\":"
          + "       [{\"mod\":\"dm_1\",\"port\":0,\"event\":1,\"dst\":"
          + "           [{\"mod\":\"st_ana1\",\"port\":0,\"master\":1"
@@ -211,7 +196,7 @@ void simd_sys_scalar_c::exec_thrd(
       // DM 1 for step4
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"dm_1\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"dm_1\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"rd_vec_head\",\"rd_vec_tail\""
          + "       ],"
@@ -230,7 +215,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Configure VRI Destination for step4
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"st_ana1\",\"idx\":3,\"cmd\":\"put\",\"data\":"
+         + "{ \"dst\":[\"st_ana1\"],\"idx\":3,\"cmd\":\"put\",\"data\":"
          + "    {\"exec_idx\":999,\"stat_idx\":0,\"conf_next\":8,\"events\":"
          + "       [\"vec_head\",\"vec_tail\""
          + "       ],"
@@ -242,22 +227,22 @@ void simd_sys_scalar_c::exec_thrd(
       // Run
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dest\":\"broadcast\",\"idx\":100,\"cmd\":\"run\""
+         + "{ \"dst\":\"broadcast\",\"idx\":100,\"cmd\":\"run\""
          + "}" );
       SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Config 01.13";
 
       // Wait for the completion events from the modules and xbar
       evt_proc_init( std::string("")
          + "{\"valid_all\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_head\"   },"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_head\"}"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_head\"   },"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"rd_vec_head\"}"
          + "  ],"
          + " \"error_any\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_tail\"   },"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_head\"},"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1.complete\" }"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_tail\"   },"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"wr_vec_head\"},"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"wr_vec_tail\"},"
+         + "   {\"src\":\"xbar\",   \"evt\":\"dm_1.complete\" }"
          + "  ]"
          + "}" );
 
@@ -282,15 +267,15 @@ void simd_sys_scalar_c::exec_thrd(
       // Wait for the completion events from the modules and xbar
       evt_proc_init( std::string("")
          + "{\"valid_all\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_tail\"   },"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
-         + "   {\"mod\":\"xbar\",   \"evt\":\"dm_1.complete\" }"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_tail\"   },"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"rd_vec_tail\"},"
+         + "   {\"src\":\"xbar\",   \"evt\":\"dm_1.complete\" }"
          + "  ],"
          + " \"error_any\":"
-         + "  [{\"mod\":\"st_ana1\",\"evt\":\"vec_head\"   },"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"rd_vec_head\"},"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_head\"},"
-         + "   {\"mod\":\"dm_1\",   \"evt\":\"wr_vec_tail\"}"
+         + "  [{\"src\":\"st_ana1\",\"evt\":\"vec_head\"   },"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"rd_vec_head\"},"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"wr_vec_head\"},"
+         + "   {\"src\":\"dm_1\",   \"evt\":\"wr_vec_tail\"}"
          + "  ]"
          + "}" );
 

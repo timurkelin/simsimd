@@ -12,7 +12,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 #include "simd_sys_dmeu.h"
-#include "simd_sys_bmux.h"
+#include "simd_ptree_xbar.h"
 #include "simd_sys_xbar.h"
 
 // Short alias for the namespace
@@ -45,10 +45,10 @@ namespace simd {
       std::vector<simd_sys_dmeu_info_t> dmeu_info;
 
       // Pointers to the submodules
-      boost::optional<simd::simd_sys_xbar_c  &> xbar_p  = boost::none;
-      boost::optional<simd::simd_sys_event_c &> event_p = boost::none;
-      boost::optional<simd::simd_sys_bmuxw_c &> bmuxw_p = boost::none;
-      boost::optional<simd::simd_sys_bmuxr_c &> bmuxr_p = boost::none;
+      boost::optional<simd::simd_sys_xbar_c   &> xbar_p  = boost::none;
+      boost::optional<simd::simd_ptree_xbar_c &> event_p = boost::none;
+      boost::optional<simd::simd_ptree_xbar_c &> bmuxw_p = boost::none;
+      boost::optional<simd::simd_ptree_xbar_c &> bmuxr_p = boost::none;
 
       // dmeu state and enable channels
       sc_core::sc_vector<sc_core::sc_signal<simd_sig_dmeu_state_c>> state_v;

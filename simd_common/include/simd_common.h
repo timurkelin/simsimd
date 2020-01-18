@@ -10,7 +10,6 @@
 
 // System components
 #include "simd_pref.h"
-#include "simd_sys_bmux.h"
 #include "simd_sys_scalar.h"
 #include "simd_sys_crm.h"
 #include "simd_sys_core.h"

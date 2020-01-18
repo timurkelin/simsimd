@@ -159,38 +159,87 @@ void simd_sys_core_c::init(
                                         << " Nxi: " << xbar_p.get().data_xvi.size()
                                         << " Nxo: " << xbar_p.get().data_xvo.size();
 
+   // Create initialisation data for routers
+   boost_pt::ptree endpoint_pt;
+   boost_pt::ptree dmeu_list_pt; // all dm/eu's
+   boost_pt::ptree dest_list_pt; // all dm/eu's + xbar
+   boost_pt::ptree sclr_list_pt;
+
+   BOOST_FOREACH( simd_sys_dmeu_info_t& v, dmeu_info ) {
+      endpoint_pt.clear();
+      endpoint_pt.put( "name", v.name );
+      endpoint_pt.put( "dump", "" ); // don't dump inside xbars
+      dmeu_list_pt.push_back( std::make_pair( "", endpoint_pt ));
+      dest_list_pt.push_back( std::make_pair( "", endpoint_pt ));
+   }
+
+   endpoint_pt.clear();
+   endpoint_pt.put( "name", xbar_p.get().name());
+   endpoint_pt.put( "dump", "" );
+   dest_list_pt.push_back( std::make_pair( "", endpoint_pt ));
+
    // Create and initialise Event router
    mod_name = std::string( name()) + "_event";
-   event_p = boost::optional<simd::simd_sys_event_c &>(
-         *( new simd_sys_event_c( mod_name.c_str())));
+   event_p = boost::optional<simd::simd_ptree_xbar_c &>(
+         *( new simd_ptree_xbar_c( mod_name.c_str())));
+
+   endpoint_pt.clear();
+   endpoint_pt.put( "name", "scalar");
+   endpoint_pt.put( "dump", mod_name + ".data" );
+   sclr_list_pt.clear();
+   sclr_list_pt.push_back( std::make_pair( "", endpoint_pt ));
+
+   endpoint_pt.clear();
+   endpoint_pt.add_child( "src_list", dest_list_pt );
+   endpoint_pt.add_child( "dst_list", sclr_list_pt );
 
    event_p.get().init(
-         dmeu_info );
+         boost::optional<const boost_pt::ptree&>( endpoint_pt ));
 
    SIMD_REPORT_INFO( "simd::sys_core" ) << "ICU inst: " << event_p.get().name()
-                                        << " Nxi: " << event_p.get().event_vi.size();
+                                        << " Nxi: "     << event_p.get().vi.size();
 
    // Create and initialise BMUXW
    mod_name = std::string( name()) + "_bmuxw";
-   bmuxw_p = boost::optional<simd::simd_sys_bmuxw_c &>(
-         *( new simd_sys_bmuxw_c( mod_name.c_str())));
+   bmuxw_p = boost::optional<simd::simd_ptree_xbar_c &>(
+         *( new simd_ptree_xbar_c( mod_name.c_str())));
+
+   endpoint_pt.clear();
+   endpoint_pt.put( "name", "scalar");
+   endpoint_pt.put( "dump", mod_name + ".data" );
+   sclr_list_pt.clear();
+   sclr_list_pt.push_back( std::make_pair( "", endpoint_pt ));
+
+   endpoint_pt.clear();
+   endpoint_pt.add_child( "src_list", sclr_list_pt );
+   endpoint_pt.add_child( "dst_list", dest_list_pt );
 
    bmuxw_p.get().init(
-         dmeu_info );
+         boost::optional<const boost_pt::ptree&>( endpoint_pt ));
 
    SIMD_REPORT_INFO( "simd::sys_core" ) << "BMUXW inst: " << bmuxw_p.get().name()
-                                        << " Nxi: " << bmuxw_p.get().busw_vo.size();
+                                        << " Nxi: "       << bmuxw_p.get().vo.size();
 
    // Create and initialise BMUXR
    mod_name = std::string( name()) + "_bmuxr";
-   bmuxr_p = boost::optional<simd::simd_sys_bmuxr_c &>(
-         *( new simd_sys_bmuxr_c( mod_name.c_str())));
+   bmuxr_p = boost::optional<simd::simd_ptree_xbar_c &>(
+         *( new simd_ptree_xbar_c( mod_name.c_str())));
+
+   endpoint_pt.clear();
+   endpoint_pt.put( "name", "scalar");
+   endpoint_pt.put( "dump", mod_name + ".data" );
+   sclr_list_pt.clear();
+   sclr_list_pt.push_back( std::make_pair( "", endpoint_pt ));
+
+   endpoint_pt.clear();
+   endpoint_pt.add_child( "src_list", dmeu_list_pt );
+   endpoint_pt.add_child( "dst_list", sclr_list_pt );
 
    bmuxr_p.get().init(
-         dmeu_info );
+         boost::optional<const boost_pt::ptree&>( endpoint_pt ));
 
    SIMD_REPORT_INFO( "simd::sys_core" ) << "BMUXR inst: " << bmuxr_p.get().name()
-                                        << " Nxi: " << bmuxr_p.get().busr_vi.size();
+                                        << " Nxi: "       << bmuxr_p.get().vi.size();
 
    // Initialise event, Config and Status channel vectors
    event_chn_v.init( dmeu_info.size() + 1); // We also need a channel for xbar events
@@ -219,13 +268,13 @@ void simd_sys_core_c::init(
 
       // Connect event, Config and Status channels
       v.mod_p.get().event_o.bind( event_chn_v.at( v.idx ));
-      event_p.get().event_vi.at( v.idx ).bind( event_chn_v.at( v.idx ));
+      event_p.get().vi.at( v.idx ).bind( event_chn_v.at( v.idx ));
 
       v.mod_p.get().busw_i.bind( busw_chn_v.at( v.idx ));
       v.mod_p.get().busr_o.bind( busr_chn_v.at( v.idx ));
 
-      bmuxw_p.get().busw_vo.at( v.idx ).bind( busw_chn_v.at( v.idx ));
-      bmuxr_p.get().busr_vi.at( v.idx ).bind( busr_chn_v.at( v.idx ));
+      bmuxw_p.get().vo.at( v.idx ).bind( busw_chn_v.at( v.idx ));
+      bmuxr_p.get().vi.at( v.idx ).bind( busr_chn_v.at( v.idx ));
 
       // Connect clock and reset for DM/EU
       v.mod_p.get().clock_i.bind( clock_i );
@@ -240,8 +289,8 @@ void simd_sys_core_c::init(
    xbar_p.get().busw_i.bind(
          busw_chn_v.at(
                busw_chn_v.size() - 1 ));
-   bmuxw_p.get().busw_vo.at(
-         bmuxw_p.get().busw_vo.size() - 1 ).bind(
+   bmuxw_p.get().vo.at(
+         bmuxw_p.get().vo.size() - 1 ).bind(
                busw_chn_v.at(
                      busw_chn_v.size() - 1 ));
 
@@ -249,27 +298,21 @@ void simd_sys_core_c::init(
    xbar_p.get().event_o.bind(
          event_chn_v.at(
                event_chn_v.size() - 1 ));
-   event_p.get().event_vi.at(
-         event_p.get().event_vi.size() - 1 ).bind(
+   event_p.get().vi.at(
+         event_p.get().vi.size() - 1 ).bind(
                event_chn_v.at(
                      event_chn_v.size() - 1 ));
 
-   // Connect clock, reset and output port for Event MUX
-   event_p.get().clock_i.bind( clock_i );
-   event_p.get().reset_i.bind( reset_i );
-   event_p.get().event_o.bind( event_chn_o );
+   // Connect output port for Event MUX
+   event_p.get().vo.at( 0 ).bind( event_chn_o );
    event_ei.bind( event_chn_o );
 
-   // Connect clock, reset and output port for BMUXR
-   bmuxr_p.get().clock_i.bind( clock_i );
-   bmuxr_p.get().reset_i.bind( reset_i );
-   bmuxr_p.get().busr_o.bind( busr_chn_o );
+   // Connect output port for BMUXR
+   bmuxr_p.get().vo.at( 0 ).bind( busr_chn_o );
    busr_ei.bind( busr_chn_o );
 
-   // Connect clock, reset and output port for BMUXC
-   bmuxw_p.get().clock_i.bind( clock_i );
-   bmuxw_p.get().reset_i.bind( reset_i );
-   bmuxw_p.get().busw_i.bind( busw_chn_i );
+   // Connect input port for BMUXW
+   bmuxw_p.get().vi.at( 0 ).bind( busw_chn_i );
    busw_eo.bind( busw_chn_i );
 
    // Add signal traces only after everything has been connected

@@ -331,6 +331,7 @@ void simd_sys_xbar_c::event(
       boost_pt::ptree  event_pt;
       simd_sig_ptree_c event_out;
 
+      event_pt.put( "src",      name() );
       event_pt.put( "event_id", mod_name + "." + event_id );
       event_o->nb_write( event_out.set( event_pt ));
    }

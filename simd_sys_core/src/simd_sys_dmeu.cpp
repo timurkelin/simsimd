@@ -119,8 +119,11 @@ void simd_sys_dmeu_c::parse_busw_req(
    if( cmd == "get") {
       // Report status
       try {
+         boost_pt::ptree  stat_pt = status.at( idx );
+         stat_pt.put( "src", name() );
+
          simd_sig_ptree_c stat;
-         busr_o->write( stat.set( status.at( idx )));
+         busr_o->write( stat.set( stat_pt ));
       }
       catch( const std::exception& err ) {
          SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " " << err.what();
@@ -299,6 +302,7 @@ bool simd_sys_dmeu_c::event(
          boost_pt::ptree  event_pt;
          simd_sig_ptree_c event_out;
 
+         event_pt.put( "src",      name()   );
          event_pt.put( "event_id", event_id );
          event_o->nb_write( event_out.set( event_pt ));
       }
