@@ -102,7 +102,6 @@ examples     	- application examples
 		+- fft-r4	- R4/2R2 fft
 		+- sort		- Bitonic sorter
 	+- system		- system design examples		
-simd_sys_bmux   - System component: control and event bus muxes (obsolete)
 simd_sys_crm    - System component: clock and reset source for the execution core
 simd_sys_core	- System component: simd execution core (interconnect and signals)
 simd_sys_dm     - System component: data memory units  
