@@ -11,14 +11,14 @@
 
 namespace simd {
 
-static bool valid_trans_sync[4][4] = // [prev_state][curr_state]
+static std::vector<std::vector<bool>> valid_trans_sync = // [prev_state][curr_state]
 { /*       IDLE,  BODY   HEAD   TAIL */
 /*IDLE*/ { true,  true,  true,  true  },
 /*BODY*/ { true,  true,  false, true  },
 /*HEAD*/ { true,  true,  false, true  },
 /*TAIL*/ { true,  false, true,  true  }}; // tail->tail when the current vector is of size 1
 
-static bool valid_trans_async[4][4] = // [prev_state][curr_state]
+static std::vector<std::vector<bool>> valid_trans_async = // [prev_state][curr_state]
 { /*       IDLE,  BODY   HEAD   TAIL */
 /*IDLE*/ { true,  true,  true,  true  },
 /*BODY*/ { true,  true,  false, true  },
@@ -74,8 +74,18 @@ inline void simd_chn_dmeu_data_o::nb_valid(
    bool is_ready_curr = (bool)ready_i->read().get();
 
    if( is_ready_curr || ( !( is_waiting || ( valid_sig.get() != SIMD_IDLE ))) || ( !sync )) {
-      bool is_trans_valid = sync ? valid_trans_sync[ valid_prev][valid]
-                                 : valid_trans_async[valid_prev][valid];
+      bool is_trans_valid = false;
+
+      try {
+         is_trans_valid = sync ? valid_trans_sync.at(  valid_prev).at( valid )
+                               : valid_trans_async.at( valid_prev).at( valid );
+      }
+      catch( const std::exception& err ) {
+         SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " " <<  err.what();
+      }
+      catch( ... ) {
+         SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " Unexpected";
+      }
 
       if( !is_trans_valid ) {
          SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " VRI sequence violation";
@@ -105,8 +115,18 @@ inline void simd_chn_dmeu_data_o::nb_write(
    bool is_ready_curr = (bool)ready_i->read().get();
 
    if( is_ready_curr || ( !( is_waiting || ( valid_sig.get() != SIMD_IDLE ))) || ( !sync )) {
-      bool is_trans_valid = sync ? valid_trans_sync[ valid_sig.get()][valid]
-                                 : valid_trans_async[valid_sig.get()][valid];
+      bool is_trans_valid = false;
+
+      try {
+         is_trans_valid = sync ? valid_trans_sync.at(  valid_sig.get()).at( valid )
+                               : valid_trans_async.at( valid_sig.get()).at( valid );
+      }
+      catch( const std::exception& err ) {
+         SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " " <<  err.what();
+      }
+      catch( ... ) {
+         SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " Unexpected";
+      }
 
       if( !is_trans_valid ) {
          SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " VRI sequence violation";
@@ -169,8 +189,18 @@ inline void simd_chn_dmeu_data_i::nb_read(
 
    // Checker
    if( ready_sig.get() || is_read_done || ( !sync )) {
-      bool is_trans_valid = sync ? valid_trans_sync[ valid_prev][valid]
-                                 : valid_trans_async[valid_prev][valid];
+      bool is_trans_valid = false;
+
+      try {
+         is_trans_valid = sync ? valid_trans_sync.at(  valid_prev).at( valid )
+                               : valid_trans_async.at( valid_prev).at( valid );
+      }
+      catch( const std::exception& err ) {
+         SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " " <<  err.what();
+      }
+      catch( ... ) {
+         SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " Unexpected";
+      }
 
       if( !is_trans_valid ) {
          SIMD_REPORT_ERROR( "simd::sys_dmeu" ) << name() << " VRI sequence violation";
@@ -224,4 +254,3 @@ void simd_chn_dmeu_data_i::add_trace(
 }
 
 } // namespace simd
-

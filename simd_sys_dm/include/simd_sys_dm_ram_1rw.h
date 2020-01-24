@@ -69,11 +69,11 @@ namespace simd {
       // Accesses to memory array (more or less represent HW)
       std::vector<std::vector<simd_dmeu_slot_t>> mem;           // memory array
 
-      simd_sig_dmeu_data_c mem_wr_data;   // Put signal to be able tracing
+      simd_sig_dmeu_data_c mem_wr_data;   // Save signal for tracing
       simd_sig_dm_addr_c   mem_wr_addr;
       bool                 mem_wr_ena = false;
 
-      simd_sig_dmeu_data_c mem_rd_data;   // Put signal to be able tracing
+      simd_sig_dmeu_data_c mem_rd_data;   // Save signal for tracing
       simd_sig_dm_addr_c   mem_rd_addr;
       bool                 mem_rd_ena = false;
 

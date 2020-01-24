@@ -394,8 +394,7 @@ void simd_sys_dm_ram_1rw_c::proc_thrd(
 
       // RD access to memory array. Occurs before write
       if( mem_rd_ena ) {
-         simd_dmeu_data_c rd_data;
-         simd_dm_addr_c   rd_addr = mem_rd_addr.get();
+         rd_addr = mem_rd_addr.get();
 
          for( std::size_t dim = 0; dim < rd_addr.dim; dim ++ ) {
             if( rd_addr[dim].ena ) {
@@ -419,8 +418,8 @@ void simd_sys_dm_ram_1rw_c::proc_thrd(
 
       // WR access to memory array. Occurs after read
       if( mem_wr_ena ) {
-         simd_dmeu_data_c wr_data = mem_wr_data.get();
-         simd_dm_addr_c   wr_addr = mem_wr_addr.get();
+         wr_data = mem_wr_data.get();
+         wr_addr = mem_wr_addr.get();
 
          for( std::size_t dim = 0; dim < wr_addr.dim; dim ++ ) {
             if( wr_addr[dim].ena && wr_data[dim].ena ) {

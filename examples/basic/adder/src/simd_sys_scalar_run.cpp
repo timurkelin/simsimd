@@ -258,7 +258,7 @@ void simd_sys_scalar_c::exec_thrd(
       // Run
       sc_core::wait();
       wr_conf( std::string("")
-         + "{ \"dst\":\"broadcast\"],\"idx\":100,\"cmd\":\"run\""
+         + "{ \"dst\":\"broadcast\",\"idx\":100,\"cmd\":\"run\""
          + "}" );
       SIMD_REPORT_INFO( "simd::sys_scalar" ) << " Start  01.15";
 

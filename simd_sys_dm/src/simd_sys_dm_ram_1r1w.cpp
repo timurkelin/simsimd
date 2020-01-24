@@ -399,7 +399,6 @@ void simd_sys_dm_ram_1r1w_c::req_run(   // Execution request
       p_rd_ag.get().init( rd_ag_prm_p );
       rd_smp_cnt = 0;    // Reset sample counter
    } // if( rd_ena )
-
 }
 
 void simd_sys_dm_ram_1r1w_c::proc_thrd(
@@ -411,7 +410,7 @@ void simd_sys_dm_ram_1r1w_c::proc_thrd(
    simd_dm_addr_c        wr_addr;
 
    simd_dmeu_ready_t     wr_ready = false;
-   simd_dmeu_state_t     wr_state     = DMEU_ST_IDLE;
+   simd_dmeu_state_t     wr_state = DMEU_ST_IDLE;
 
    // RD side variables
    simd_dmeu_valid_t     rd_valid = SIMD_IDLE;
@@ -443,8 +442,7 @@ void simd_sys_dm_ram_1r1w_c::proc_thrd(
 
       // RD access to memory array. Occurs before write
       if( mem_rd_ena ) {
-         simd_dmeu_data_c rd_data;
-         simd_dm_addr_c   rd_addr = mem_rd_addr.get();
+         rd_addr = mem_rd_addr.get();
 
          for( std::size_t dim = 0; dim < rd_addr.dim; dim ++ ) {
             if( rd_addr[dim].ena ) {
@@ -469,8 +467,8 @@ void simd_sys_dm_ram_1r1w_c::proc_thrd(
 
       // WR access to memory array. Occurs after read
       if( mem_wr_ena ) {
-         simd_dmeu_data_c wr_data = mem_wr_data.get();
-         simd_dm_addr_c   wr_addr = mem_wr_addr.get();
+         wr_data = mem_wr_data.get();
+         wr_addr = mem_wr_addr.get();
 
          for( std::size_t dim = 0; dim < wr_addr.dim; dim ++ ) {
             if( wr_addr[dim].ena && wr_data[dim].ena ) {

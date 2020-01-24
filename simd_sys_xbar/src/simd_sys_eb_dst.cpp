@@ -1,5 +1,5 @@
 /*
- * simd_sys_eb.h
+ * simd_sys_eb_dst.h
  *
  *  Description:
  *    Methods of the elastic buffer
@@ -66,10 +66,10 @@ void simd_sys_eb_dst_c::async_thrd(
    for(;;) {
       // Create combined event
       sc_core::sc_event_or_list evt_or_list = ready_o.value_changed_event() |
-                                               data_w_s1.value_changed_event() |
-                                               data_w_s2.value_changed_event() |
-                                              valid_w_s1.value_changed_event() |
-                                              valid_w_s2.value_changed_event();
+                                            data_w_s1.value_changed_event() |
+                                            data_w_s2.value_changed_event() |
+                                           valid_w_s1.value_changed_event() |
+                                           valid_w_s2.value_changed_event();
 
       sc_core::wait( evt_or_list );
 
@@ -95,8 +95,15 @@ void simd_sys_eb_dst_c::sync_thrd(
    simd_dmeu_ready_t ready_o_s0;
    simd_dmeu_valid_t valid_o_s0;
 
+   // Reset state
    ready_o->write( ready_w.set( true ));
    tail_o->write( false );
+
+   valid_i_s1 = SIMD_IDLE;
+   valid_i_s2 = SIMD_IDLE;
+
+   valid_w_s1.write( valid_w.set( valid_i_s1 ));
+   valid_w_s2.write( valid_w.set( valid_i_s2 ));
 
    for(;;) {
       sc_core::wait();

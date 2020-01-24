@@ -1,5 +1,5 @@
 /*
- * simd_sys_eb.h
+ * simd_sys_eb_src.h
  *
  *  Description:
  *    Methods of the elastic buffer
