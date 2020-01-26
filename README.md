@@ -118,11 +118,10 @@ simd_report  	- logging and reporting functions
 simd_systemc 	- Files taken from SystemC sources  
 simd_trace   	- waveform trace  
 simd_time    	- simulation time and resolution  
-tools        	- supporting scripts  
-makefile     	- top-level makefile 
 ```
 Prerequisites:   
-   GCC      (4.8.5)  
+   GCC      (4.8.5)   
+   cmake    (3.16)    
    make     (3.82)  
    [SystemC  (2.3.3)][systemc]   
    [Boost    (1.68.0)][boost]   
@@ -143,14 +142,15 @@ Quick start:
 Skim through the slides:
 doc/simsimd.pptx
 
-Clean:
-make EXAMPLE=basic/vri_test clean
-
 Build:
-make EXAMPLE=basic/vri_test all
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=Release -DEXAMPLE=basic/vri_test ..
+$ make all
 
 Run:
-./build/Release/out/simsimd
+cd ..
+./build/simsimd
 
 Inspect the result:
 In gtkwave File->Open New Window->trace.vcd 
