@@ -15,6 +15,7 @@ Vector Processor Architecture, SIMD, Single Instruction Multiple Data, ASIP, App
   
 * Typical applications and their data vectors
   * Signal processing: _OFDM symbols and/or code blocks_
+  * Image and Video processing
   * Cryptography: _cipher blocks_
   * Networking: _data packets_
   
