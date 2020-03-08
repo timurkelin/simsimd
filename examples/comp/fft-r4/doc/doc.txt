@@ -1,0 +1,9 @@
+
+Inside the FFT Black Box Serial and Parallel Fast Fourier Transform Algorithms by Eleanor Chu 9780849302701 (Hardback, 1999)
+
+DFT/FFT and Convolution Algorithms and Implementation by C. S. Burrus (1985-01-04)
+
+Computational Frameworks for the Fast Fourier Transform
+Author(s): Charles Van Loan
+
+Fast Fourier Transform - Algorithms and Applications, Paperback by Rao, K. R.; Kim, Do Nyeon; Hwang, Jae Jeong, ISBN 9400733593, ISBN-13 9789400733596, Brand New, Free P&P in the UK
